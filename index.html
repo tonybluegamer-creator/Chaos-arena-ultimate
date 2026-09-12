@@ -10,7 +10,7 @@
 <title>CAOS ARENA ULTIMATE</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:#090b12;color:#fff;font-family:'Segoe UI',Arial,sans-serif;overflow:hidden;height:100%;height:100dvh;touch-action:none}
+html,body{margin:0;background:#090b12;color:#fff;font-family:'Segoe UI',Arial,sans-serif;overflow:hidden;height:100%;height:100dvh;touch-action:manipulation}
 body{display:flex;align-items:center;justify-content:center;height:100%;height:100dvh;width:100%;cursor:default;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 #wrap{position:relative;width:min(100vw,1280px);height:min(100dvh,720px);max-width:100%;max-height:100%;background:#101522;border-radius:6px;overflow:hidden;contain:layout style paint}
 canvas{width:100%;height:100%;display:block;image-rendering:auto;cursor:crosshair;touch-action:none}
@@ -25,12 +25,12 @@ canvas{width:100%;height:100%;display:block;image-rendering:auto;cursor:crosshai
 #rotateOverlay p{max-width:280px;color:#aab1c6;font-size:14px;line-height:1.5}
 @keyframes rotHint{0%,100%{transform:rotate(0deg)}50%{transform:rotate(90deg)}}
 @media (orientation:portrait) and (pointer:coarse){
- #rotateOverlay{display:flex}
- #wrap{display:none}
+ #rotateOverlay{display:flex;pointer-events:none}
+ #wrap{display:flex}
 }
 @media (orientation:portrait) and (max-width:640px){
- #rotateOverlay{display:flex}
- #wrap{display:none}
+ #rotateOverlay{display:flex;pointer-events:none}
+ #wrap{display:flex}
 }
 
 /* ---------- Start / main menu ---------- */
@@ -49,10 +49,13 @@ h1{margin:0 0 6px;font-size:clamp(28px,5vw,44px);letter-spacing:2px;
  background:linear-gradient(90deg,#55d9ff,#ff8fd0,#ffe36e);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:#9aa2ba;font-size:14px;margin:4px 0}
 .menuRow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
-button{border:0;border-radius:12px;padding:12px 20px;font-weight:700;font-size:14px;cursor:pointer;
+button{border:0;border-radius:12px;padding:12px 20px;font-weight:700;font-size:14px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
  transition:transform .12s ease,filter .12s ease;letter-spacing:.4px}
 button:hover{filter:brightness(1.12)}
 button:active{transform:scale(.96)}
+/* mobile UI tap fix */
+button,input,select{pointer-events:auto;touch-action:manipulation}
+#rotateOverlay{pointer-events:none}
 .btn-primary{background:linear-gradient(135deg,#fff,#c9d3ff);color:#101522}
 .btn-ghost{background:#232a3f;color:#dfe4f5;border:1px solid #ffffff22}
 .btn-accent{background:linear-gradient(135deg,#55d9ff,#8f6bff);color:#0a0e18}
@@ -1600,6 +1603,17 @@ document.addEventListener('click',e=>{
 },{capture:true});
 
 
+
+/* ---------- mobile button tap reliability ---------- */
+document.addEventListener('pointerup',e=>{
+  if(e.pointerType!=='touch') return;
+  const el=e.target.closest('button,input,select');
+  if(!el || el.disabled) return;
+  if(el.tagName==='BUTTON'){
+    e.preventDefault();
+    el.click();
+  }
+},{capture:true});
 
 /* ---------- global 2-finger touch cap ---------- */
 const touchGate=(()=>{
@@ -5072,10 +5086,6 @@ loop();
   clampHud();
 })();
 
- <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./service-worker.js");
-}
 </script>
 </body>
 </html>
